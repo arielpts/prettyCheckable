@@ -77,7 +77,35 @@
 
       var classType = el.data('type') !== undefined ? el.data('type') : el.attr('type');
 
-      var label = el.data('label') !== undefined ? el.data('label') : '';
+      var label = '';
+
+      if (el.data('label') == undefined) {
+        // Grab from the actual - non obstructive, and current - label
+        var elLabel = undefined;
+
+        // First try the <label for=
+        if (el.attr('id') != undefined) {
+          elLabel = $('label[for="' + el.attr('id') + '"]');
+          label = elLabel.html();
+          elLabel.hide();
+        }
+
+        // The second try is the <label><input...></label> encapsulation
+        if (elLabel == undefined || !elLabel[0]) {
+          elLabel = el.closest('label');
+          label = elLabel.text();
+          elLabel.contents().each(function(k, e) {
+            // Text
+            if (e.nodeType == 3) {
+              // "Hides" the node text content
+              e.textContent = '';
+            }
+          });
+        }
+      } else {
+        // Grab from data param
+        label = el.data('label');
+      }
 
       var labelPosition = el.data('labelposition') !== undefined ? 'label' + el.data('labelposition') : 'label' + this.options.labelPosition;
 
